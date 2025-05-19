@@ -1,11 +1,16 @@
 # ASR-notes
 
 A collection of notes, tutorials, and implementations for Automatic Speech Recognition (ASR).
-Convers fundamentails, popular open-sources model (like Whisper, DeepSpeech), and practical use cases such as real-time transcription and model fine-tuning.
+Covers fundamentals, popular open-source models (like Whisper, DeepSpeech), and practical use cases such as real-time transcription and model fine-tuning.
+Also includes audio data handling and analysis tools.
 
 ---
 
 ## Contents
+
+### Basic
+
+- [Audio Data](./basic/audio_data/README.md)
 
 ### Awesome Whisper
 
@@ -15,7 +20,7 @@ Convers fundamentails, popular open-sources model (like Whisper, DeepSpeech), an
 - GitHub: [openai/whisper](https://github.com/openai/whisper)
 - Paper: [Robust Speech Recognition via Large-Scale Weak Supervision](https://cdn.openai.com/papers/whisper.pdf)
 
-#### 2. Whisper Model variants
+#### 2. Whisper Model Variants
 
 Whisper-based implementations that improve speed, compatibility, or functionality.
 
@@ -29,6 +34,7 @@ Experimental or community-based projects that adapt Whisper for real-time/stream
 
 - [ufal/whisper_streaming](https://github.com/ufal/whisper_streaming): Real-time Whisper with buffering and chunked inference
 - [WhisperLiveKit](https://github.com/QuentinFuxa/WhisperLiveKit): Local real-time STT with speaker diarization, FastAPI server & web UI
+- [whisper-streaming-practice](https://github.com/kaka-lin/whisper-streaming-practice): Practical implementation of streaming Whisper inference with custom audio/VAD handling
 
 ---
 
@@ -45,6 +51,26 @@ Experimental or community-based projects that adapt Whisper for real-time/stream
   - Languages: [Full list](https://cloud.google.com/speech-to-text/docs/languages)
   - Output formats: JSON, SRT, word-level timestamps, diarization, and punctuation
 
+- 🧰 [gcloud-python-toolkit](https://github.com/kaka-lin/gcloud-python-toolkit)
+
+  A collection of Python scripts and utilities for interacting with Google Cloud services, including:
+    - **Google Drive Downloader**: List and download all files from a specified folder.
+    - **Google Speech Transcribe**: Transcribe audio using the `chirp_2` model.
+
 ---
 
-> ✨ Contributions welcome! This repo aims to be a well-organized reference for ASR experiments and deployment.
+### Related Repositories
+
+Practical tools and apps that extend ASR capabilities.
+
+- 🔊 [audio-recognition-app](https://github.com/kaka-lin/audio-recognition-app)
+  Command-line and Web UI interface for speech recognition apps using Whisper or SpeechRecognition.
+
+- 🧰 [audio-tools](https://github.com/kaka-lin/audio-tools)
+  Utilities for working with audio: WAV reader/writer, recording, ALSA/tinyalsa wrappers.
+
+- 📊 [audio-analysis-tools](https://github.com/kaka-lin/audio-analysis-tools)
+  Tools for spectral analysis, FFT visualization, and feature extraction.
+
+- 😊 [speech-emotion-recognition](https://github.com/kaka-lin/speech-emotion-recognition)
+  Deep learning models for detecting emotion from audio, based on datasets like RAVDESS.
