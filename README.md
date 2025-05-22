@@ -63,7 +63,7 @@ Experimental or community-based projects that adapt Whisper for real-time/stream
 
 Practical tools and apps that extend ASR capabilities.
 
-- 🔊 [audio-recognition-app](https://github.com/kaka-lin/audio-recognition-app)
+- 🔊 [Multi-ASR Toolkit](https://github.com/kaka-lin/multi-asr-toolkit)
   Command-line and Web UI interface for speech recognition apps using Whisper or SpeechRecognition.
 
 - 🧰 [audio-tools](https://github.com/kaka-lin/audio-tools)
