@@ -12,29 +12,9 @@ Also includes audio data handling and analysis tools.
 
 - [Audio Data](./basic/audio_data/README.md)
 
-### Awesome Whisper
+### Whisper
 
-#### 1. Official Whisper
-
-- Introduction: [Whisper on OpenAI](https://openai.com/index/whisper)
-- GitHub: [openai/whisper](https://github.com/openai/whisper)
-- Paper: [Robust Speech Recognition via Large-Scale Weak Supervision](https://cdn.openai.com/papers/whisper.pdf)
-
-#### 2. Whisper Model Variants
-
-Whisper-based implementations that improve speed, compatibility, or functionality.
-
-- [faster-whisper](https://github.com/SYSTRAN/faster-whisper): High-performance Whisper inference using CTranslate2 (CPU/GPU optimized)
-- [mlx-whisper](https://github.com/ml-explore/mlx-examples/tree/main/whisper): Whisper ported to Apple's MLX framework (runs on Apple Silicon)
-- [WhisperX](https://github.com/m-bain/whisperX): Word-level timestamps and speaker diarization built on Whisper
-
-#### 3. Whisper Streaming Implementations
-
-Experimental or community-based projects that adapt Whisper for real-time/streaming ASR.
-
-- [ufal/whisper_streaming](https://github.com/ufal/whisper_streaming): Real-time Whisper with buffering and chunked inference
-- [WhisperLiveKit](https://github.com/QuentinFuxa/WhisperLiveKit): Local real-time STT with speaker diarization, FastAPI server & web UI
-- [whisper-streaming-practice](https://github.com/kaka-lin/whisper-streaming-practice): Practical implementation of streaming Whisper inference with custom audio/VAD handling
+- [Whisper Notes](./whisper/README.md)
 
 ---
 
