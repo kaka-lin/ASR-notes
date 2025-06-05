@@ -2,6 +2,8 @@
 
 本文件介紹 [faster-whisper](https://github.com/SYSTRAN/faster-whisper) 中兩個重要參數 `cpu_threads` 與 `num_workers` 的用法與差異，並提供在不同執行模式（CPU、GPU）下的範例。
 
+直接看結論: [總結](#總結)
+
 ## Whisper 推理流程簡介
 
 > 音訊前處理 (Mel Spectrogram) -> Encoder -> Decoder
@@ -137,6 +139,48 @@ for t in threads:
      - `device="cuda:0"`
      - `device="cuda:1"`
 
+### 補充: `num_workers > 1` 並非「完全沒用」，而是不要期望無限提升
+
+#### 1. 為什麼多 Worker 能降延遲 (前期效能提升)
+
+- Whisper 推理流程包含許多「微小的 Kernel 呼叫」（例如 Encoder 各層、Decoder beam search、softmax 等）。
+
+- 當 `num_workers=1` 時，CPU 前處理完後，一條推理一路沿著單一 Pipeline，GPU 若有空閒就跑第一批 Kernel，再回到 CPU，再送下一步 Kernel，造成 GPU 在不同階段的 idle 空洞。
+
+- 當 `num_workers=2~4`：多個 Worker 可以同時把不同階段的 Kernel 送進同一張 GPU，使 GPU pipeline 被「塞得飽滿」。例如：
+
+    - Worker A 正在跑第 3 層 Decoder，GPU 有空，就同時跑 Worker B 的第 1 層 Encoder，或 Worker C 的第 2 層 Encoder，使 GPU 內部多個 SM/Stream 同步運作，減少 idle。
+
+    這樣一來就能讓延遲（單條音訊）從 0.589s → 0.177s（大約 3×~4× 的速度提升）。
+
+#### 2. 為何 `num_workers` 繼續增加後效益遞減或反而變慢
+
+- GPU 只有一張卡，最終所有 Worker 的 Kernel 還是擠到同一個排程隊列 (Command Queue)。
+
+- 跑到某個數量 (例如 4 左右) 時，就已經把 GPU pipeline 塞滿，再把 Worker 拉到 8、16，只會造成：
+
+    - 更多的小 Kernel 同時排隊，Driver 需要頻繁上下文切換 (context switch)
+
+    - 細小 Kernel 之間的排程 overhead 增加，造成頻繁的 Pipeline stall
+
+因此，適度的 Worker 數 (2–4) 通常就能把 GPU pipeline 塞到接近滿速，超過這個範圍就很難再繼續顯著提升效能。
+
+#### 3. 實務建議
+
+- 如果只是單條音訊、單卡 GPU：
+
+    1. 先從 `num_workers=1` 測起，觀察 GPU 是否有大量 idle（nvidia-smi/監控）。
+
+    2. 若 GPU idle 明顯，可嘗試 `num_workers=2 或 4`，觀察延遲是否繼續下降。
+
+    3. 如果 `num_workers=4` 已經把延遲降到最低，後續就不用再往上拉。
+
+- 如果要做多音訊（例如同時有 4 條音訊）：
+
+    - 可以直接把 `num_workers=4`，確保最多有 4 條請求的微 Kernel 在 GPU 上同時交錯運行。
+
+    - 若 `num_workers>4` 也沒必要，因為 GPU pipeline 已經飽和，再多也無法繼續壓縮。
+
 ### GPU 模式範例
 
 ```python
@@ -212,3 +256,43 @@ threads.extend([t1, t2])
 for t in threads:
     t.join()
 ```
+
+## 總結
+
+#### 1. CPU 模式
+
+- `cpu_threads`：用於加速「前處理」與「Encoder/Decoder」的多執行緒計算。
+
+- `num_workers`：在同一個模型實例內，讓最多 num_workers 條請求同時執行整條推理流程。
+
+#### 2. GPU 模式
+
+- `cpu_threads`：只影響「音訊前處理 (Mel Spectrogram)」階段，Encoder/Decoder 在 GPU 上執行。
+
+- `num_workers`：在單卡 GPU 上主要用於「多條請求併發」，但不會因 Worker 增加而線性提升，因為所有 Kernel 最終都要排到同一張卡。
+
+    - 小幅提升：`num_workers` 從 1 → 2~4，可減少 GPU pipeline 中的 idle
+
+    - 遞減效益：`num_workers > 4`，反而會造成過度排隊與上下文切換 overhead，不再明顯加速。
+
+- 若想要橫向擴充到多卡，必須手動為每張卡建立獨立模型實例 (各自設 device="cuda:0"、"cuda:1"…)。
+
+#### 3. 實務建議
+
+- 單卡 GPU、單條音訊：
+
+    1. 先從 `num_workers=1`、`cpu_threads=1` 測試，查看 GPU idle 比例。
+
+    2. 若看到 GPU 空閒，就嘗試 `num_workers=2~4`，找出最低延遲。
+
+    3. 避免拉太多 Worker（>4），否則可能因為排隊 overhead 而無法再提升性能。
+
+- 多條音訊併發、單卡 GPU：
+
+    - 可把 `num_workers` 設為「與併發請求數相同或略少」(如 4 間房就試 2~4)，確保 GPU pipeline 能交錯執行不同請求的微 Kernel。
+
+    - 避免 `num_workers` 過高，否則會因 Driver 調度與上下文切換效能下降。
+
+- 多張 GPU：
+
+    - 對每張卡單獨 new 一隻模型實例，如：`device="cuda:0"`，以獲得真正的橫向擴充效能。
