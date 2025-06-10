@@ -11,6 +11,7 @@ Also includes audio data handling and analysis tools.
 ### Basic
 
 - [Audio Data](./basic/audio_data/README.md)
+- [Metrics](./basic/metrics/metric.md)
 
 ### Whisper
 
