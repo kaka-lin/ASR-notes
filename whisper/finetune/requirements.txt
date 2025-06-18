@@ -1,8 +1,8 @@
 # Core deep learning
 torch>=1.13.0
 torchaudio>=0.13.0
-transformers==4.39.3
-accelerate==0.26.1
+transformers==4.52.4
+accelerate==1.7.0
 
 # Dataset + audio processing
 datasets[audio]>=2.14.0
@@ -15,4 +15,7 @@ jiwer
 
 # To avoid TF/Keras errors from transformers
 tf-keras
-accelerate
+
+# Optional dependenciess
+trl==0.18.2          # Transformer Reinforcement Learning: Provides reinforcement learning/post-training tools such as RichProgressCallback
+rich==14.0.0         # RichProgressCallback used to render beautiful progress bars in the terminal

@@ -7,6 +7,7 @@ from transformers import WhisperProcessor
 from transformers.models.whisper.english_normalizer import BasicTextNormalizer
 from transformers import WhisperForConditionalGeneration
 from transformers import Seq2SeqTrainingArguments, Seq2SeqTrainer
+from trl import RichProgressCallback
 
 from data_utils import prepare_dataset, is_audio_in_length_range
 from collator import DataCollatorSpeechSeq2SeqWithPadding
@@ -62,26 +63,17 @@ def main():
     ds = ds.cast_column("audio", Audio(sampling_rate=sampling_rate))
 
     # 5. Prepare dataset:: Convert audio and text to model input format
-    # ds = ds.map(
-    #     partial(prepare_dataset, processor=processor),
-    #     remove_columns=ds.column_names["train"],
-    #     num_proc=1
-    # )
+    ds = ds.map(
+        partial(prepare_dataset, processor=processor),
+        remove_columns=ds.column_names["train"],
+        num_proc=1
+    )
 
-    # # 6. filter audio samples based on length
-    # ds["train"] = ds["train"].filter(
-    #     is_audio_in_length_range,
-    #     input_columns=["input_length"],
-    # )
-
-    # 5+6. Map and filter the dataset
-    # Note: This is a more efficient way to prepare the dataset
-    #       by combining the mapping and filtering steps into one operation.
-    ds["train"] = ds["train"].map(
-        lambda ex: prepare_dataset(ex, processor),
-        remove_columns=ds["train"].column_names,
-        num_proc=1,
-    ).filter(is_audio_in_length_range, input_columns=["input_length"])
+    # 6. filter audio samples based on length
+    ds["train"] = ds["train"].filter(
+        is_audio_in_length_range,
+        input_columns=["input_length"],
+    )
 
     # 7. Prepare data collator
     data_collator = DataCollatorSpeechSeq2SeqWithPadding(processor=processor)
@@ -89,6 +81,7 @@ def main():
     # 8. Prepare training arguments
     training_args = Seq2SeqTrainingArguments(
         output_dir="./whisper-small-tw",  # name on the HF Hub
+        logging_dir="./logs",
         per_device_train_batch_size=16,
         gradient_accumulation_steps=1,  # increase by 2x for every 2x decrease in batch size
         learning_rate=1e-5,
@@ -98,14 +91,14 @@ def main():
         gradient_checkpointing=True,
         fp16=use_fp16,  # only use if you have a GPU with at least 16GB of VRAM
         fp16_full_eval=use_fp16,  # only use if you have a GPU with at least 16GB of VRAM
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         per_device_eval_batch_size=16,
         predict_with_generate=True,
         generation_max_length=225,
         save_steps=500,
         eval_steps=500,
         logging_steps=25,
-        report_to=["tensorboard"],
+        report_to=["tensorboard"],  #  The list of integrations to report the results and logs to. Supported platforms are "azure_ml", "clearml", "codecarbon", "comet_ml", "dagshub", "dvclive", "flyte", "mlflow", "neptune", "swanlab", "tensorboard", and "wandb". Use "all" to report to all integrations installed, "none" for no integrations.
         load_best_model_at_end=True,
         metric_for_best_model="wer",
         greater_is_better=False,
@@ -131,8 +124,24 @@ def main():
         tokenizer=processor,
     )
 
+    # Add RichProgressCallback to the trainer
+    trainer.add_callback(RichProgressCallback())
+
     # 10. Start training
     trainer.train()
+
+    # 11. Evaluate the model on the validation set
+    # results = trainer.evaluate(
+    #     eval_dataset=ds["validation"],
+    #     metric_key_prefix="validation",
+    # )
+
+    # print(
+    #     f"Step {trainer.state.global_step} | "
+    #     f"Val Loss {results["validation_loss"]:.3f} | "
+    #     f"Wer Ortho {results["validation_wer_ortho"]:.4f} | "
+    #     f"Wer {results["validation_wer"]:.4f}"
+    # )
 
 
 if __name__ == "__main__":
