@@ -10,7 +10,7 @@ librosa
 soundfile
 
 # Evaluation metrics
-evaluate
+evaluate >= 0.3.0
 jiwer
 
 # To avoid TF/Keras errors from transformers

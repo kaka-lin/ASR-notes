@@ -1,6 +1,14 @@
 # Whisper Notes
 
-以下為 Whisper 系列的整理與分類
+Whisper 是一個基於 Transformer 的 *encoder-decoder* 模型，也稱為 *sequence-to-sequence* 模型。它將一連串的音訊頻譜圖特徵映射成一連串的文字標記。首先，原始音訊輸入會經過`特徵擷取器（feature extractor`）轉換成`對數梅爾（log-Mel）頻譜圖`。接著，Transformer encoder 對這些頻譜圖進行編碼，生成一系列的編碼器隱藏狀態（encoder hidden states）。最後，decoder 以自回歸（autoregressive）方式，根據先前已預測的文字標記與編碼器隱藏狀態，逐步產生新的文字標記。下圖對 Whisper 模型的整體流程做了摘要說明。
+
+<p align="center">
+  <img src="./images/asr-summary-of-model-architecture-desktop.png" alt="示意圖" />
+  <br>
+  <sub>圖片來源：<a href="https://openai.com/index/whisper/">OpenAI Whisper Blog</a></sub>
+</p>
+
+Whisper 的預訓練 (pre-trained) 與 [微調 (fine-tuned)](https://github.com/kaka-lin/ASR-notes/tree/main/whisper/finetune) 皆採用 *cross-entropy* 目標函數，這是訓練 *sequence-to-sequence* 系統進行分類任務時的標準做法。此處，系統被訓練去正確地從預先定義的文字詞彙表中，分類（預測）出目標文字標記。
 
 ## Awesome Whisper
 
