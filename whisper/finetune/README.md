@@ -26,9 +26,11 @@ $ tensorboard --logdir=./logs
 $ tensorboard --logdir=./logs --port 6008
 ```
 
-## Step by Step
+---
 
-### 1. Load Dataset
+# Step by Step
+
+## 1. Load Dataset
 
 Common Voice 是一系列由群眾外包（crowd-sourced）建立的資料集，講者會在各種語言中朗讀維基百科上的文字。本文撰寫時，我們會使用 Common Voice 資料集的版本: 13.0。至於目標語言，我們將在華語（zh-TW）上，對模型做微調。
 
@@ -52,7 +54,7 @@ common_voice["test"] = load_dataset("mozilla-foundation/common_voice_13_0", "zh-
 common_voice = common_voice.select_columns(["audio", "sentence"])
 ```
 
-### 2. Feature Extractor, Tokenizer and Processor
+## 2. Feature Extractor, Tokenizer and Processor
 
 The ASR pipeline can be de-composed into three stages:
 
@@ -62,7 +64,7 @@ The ASR pipeline can be de-composed into three stages:
 
 在🤗 Transformers 中，Whisper 模型有一個相關的特徵提取器（feature extractor）和標記器（tokenizer），分別稱為 [WhisperFeatureExtractor] 和 [WhisperTokenizer]。
 
-#### WhisperFeatureExtractor
+### WhisperFeatureExtractor
 
 Whisper feature extractor（特徵提取器）會執行兩項操作:
 
@@ -94,7 +96,7 @@ from transformers import WhisperFeatureExtractor
 feature_extractor = WhisperFeatureExtractor.from_pretrained("openai/whisper-small")
 ```
 
-#### WhisperTokenizer
+### WhisperTokenizer
 
 Whisper 模型輸出的 text token（文字標記）代表預測文字在詞彙字典中的索引。*tokenizer* 負責將一連串的 text token 映射為實際的文字串，例如：
 
@@ -133,7 +135,7 @@ Decoded w/out special: 地圖炮
 Are equal:             True
 ```
 
-#### Combine To Create A WhisperProcessor
+### Combine To Create A WhisperProcessor
 
 為了簡化特徵提取器和標記器的使用，我們可以將它們包裝到一個 [WhisperProcessor](https://huggingface.co/docs/transformers/model_doc/whisper#transformers.WhisperProcessor) 類別中。此處理器物件繼承自 `WhisperFeatureExtractor` 和 `WhisperTokenizer`，可根據需要用於音訊預處理和文字標記後處理。這樣，我們在訓練期間只需要追蹤兩個物件：`處理器 (processor)` 和 `模型 (model)`：
 
@@ -143,7 +145,7 @@ from transformers import WhisperProcessor
 processor = WhisperProcessor.from_pretrained("openai/whisper-small", language="zh", task="transcribe")
 ```
 
-### 3. Pre-Process the Data
+## 3. Pre-Process the Data
 
 我們將音訊的取樣率與 Whisper 模型的取樣率（16kHz）相匹配。由於我們的輸入音訊取樣率為 48kHz，因此我們需要將其下取樣至 16kHz，然後再將其傳遞給 Whisper 特徵擷取器。
 
@@ -204,7 +206,7 @@ common_voice["train"] = common_voice["train"].filter(
 
 > 注意：目前資料集使用 torchaudio 和 librosa 進行音訊載入和重採樣。如果您希望實作自訂資料載入/取樣，可以使用「path」欄位取得音訊檔案路徑，並忽略「audio」欄位。
 
-### 4. Training and Evaluation
+## 4. Training and Evaluation
 
 現在我們已經準備好資料，就可以進入訓練流程。[🤗 Trainer](https://huggingface.co/docs/transformers/main/main_classes/trainer) 會為我們完成大部分繁重的工作，我們只需要做以下幾件事：
 
@@ -218,7 +220,7 @@ common_voice["train"] = common_voice["train"].filter(
 
 當我們完成模型微調後，將在測試資料上進行評估，以驗證模型是否已正確學習將華語（zh-TW）語音轉錄成文字。
 
-#### Define a Data Collator
+### Define a Data Collator
 
 對於 *sequence-to-sequence* 語音模型而言，data collator（資料整理器）相當獨特，因為它會分開處理`input_features` 和 `labels`：
 
@@ -277,7 +279,7 @@ class DataCollatorSpeechSeq2SeqWithPadding:
 data_collator = DataCollatorSpeechSeq2SeqWithPadding(processor=processor)
 ```
 
-#### Evaluation Metrics
+### Evaluation Metrics
 
 接下來，我們定義在評估集上所使用的評估指標。我們將使用 [Word Error Rate (WER)](https://huggingface.co/learn/audio-course/chapter5/evaluation) 指標，這是評估 ASR 系統的「實際」指標。
 
@@ -329,7 +331,7 @@ def compute_metrics(pred):
     return {"wer_ortho": wer_ortho, "wer": wer}
 ```
 
-#### Load a Pre-Trained Checkpoint
+### Load a Pre-Trained Checkpoint
 
 現在讓我們載入預先訓練好的 Whisper small checkpoint。同樣，透過使用 🤗 Transformers，這很容易做到！
 
@@ -353,7 +355,7 @@ model.generate = partial(
 )
 ```
 
-#### Define the Training Configuration
+### Define the Training Configuration
 
 在最後一步中，我們定義所有與訓練相關的參數。在這裡，我們將訓練步數設定為 500。與預先訓練的 Whisper 模型相比，這些步數足以使其字錯誤率 (WER) 顯著提升。有關訓練參數的更多詳細信息，請參閱 [Seq2SeqTrainingArguments 文件](https://huggingface.co/docs/transformers/main_classes/trainer#transformers.Seq2SeqTrainingArguments)。
 
@@ -411,7 +413,7 @@ trainer = Seq2SeqTrainer(
 )
 ```
 
-#### Traning
+### Traning
 
 To launch training, simply execute:
 
