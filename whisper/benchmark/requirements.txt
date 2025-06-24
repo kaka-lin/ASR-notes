@@ -1,0 +1,6 @@
+torch>=1.13.0
+faster-whisper
+yt-dlp
+memory-profiler
+pynvml
+py3nvml
