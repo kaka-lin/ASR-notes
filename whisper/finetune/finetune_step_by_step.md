@@ -52,7 +52,7 @@ Whisper feature extractor（特徵提取器）會執行兩項操作:
     - 若樣本短於 30 秒: 則在序列末端補零（零代表靜音）
     - 若超過 30 秒: 則截掉超出部分。
 
-    由於整個批次皆被調整至相同的最大長度，傳入 Whisper 模型時就不需要提供 *attention mask*。
+    由於整個批次皆被調整至相同的最大長度，傳入 Whisper 模型時就不需要提供 [attention mask](../attention_mask.md)。
 
     > [!important]
     > Whisper 在這點上相當特殊──大多數音訊模型都必須用 attention mask 標示填充位置，以便在自注意力運算中忽略那些時刻，但 Whisper 已經訓練到不用 attention mask，就能自行判斷哪些部分該被忽略。

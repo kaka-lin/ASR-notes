@@ -40,7 +40,7 @@ Also includes audio data handling and analysis tools.
 
 ---
 
-### Related Repositories
+## Related Repositories
 
 Practical tools and apps that extend ASR capabilities.
 
