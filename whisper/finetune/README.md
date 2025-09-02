@@ -1,4 +1,4 @@
-# Fine-tuning the ASR model
+# Fine-tuning Whisper Model
 
 ## Prepare Environment
 

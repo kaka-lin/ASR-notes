@@ -1,4 +1,4 @@
-# faster-whisper: cpu_threads 與 num_workers 說明
+# faster-whisper 效能調校：`cpu_threads` vs. `num_workers`
 
 本文件介紹 [faster-whisper](https://github.com/SYSTRAN/faster-whisper) 中兩個重要參數 `cpu_threads` 與 `num_workers` 的用法與差異，並提供在不同執行模式（CPU、GPU）下的範例。
 
