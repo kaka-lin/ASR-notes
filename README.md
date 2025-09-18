@@ -14,11 +14,11 @@ Covers fundamentals, popular open-source models (like Whisper), and practical us
 
 ### 2. 模型與架構 (Models & Architectures)
 
-- **[核心架構：串流 vs. 離線 (Streaming vs. Offline)](./streaming_asr_technical_deep_dive.md)**: 深入解析兩種基礎 ASR 架構的原理、優缺點與應用場景。
+- **[ASR 技術架構解析](./asr_technical_analysis.md)**: 解析三大核心模型 (CTC, Transducer, Attention) 與兩種服務模式 (離線, 串流)。
 
 - **模型解析：Whisper**
   - **[Whisper 模型介紹](./whisper/README.md)**: 包含 Whisper 的模型結構、特點與基本使用。
-  - **[將 Whisper 改造為串流模式](./streaming_asr_technical_deep_dive.md#核心議題將-whisper-離線模型改造為串流模式)**: 探討將 Whisper 從離線模型改造成即時串流的幾種主流技術路線。
+  - **[將 Whisper 改造為串流模式](./whisper/whisper_streaming_transformation.md)**: 探討將 Whisper 從離線模型改造成即時串流的幾種主流技術路線。
   - **[模型微調 (Fine-tuning)](./whisper/finetune/finetune_step_by_step.md)**: 提供逐步指南，說明如何對 Whisper 進行微調以適應特定領域的資料。
 
 ### 3. 雲端 ASR 服務 (Cloud-based ASR APIs)
