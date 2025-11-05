@@ -15,3 +15,17 @@ venv/
 *~
 __pycache__
 
+# config
+.env
+
+# credentials
+*.json
+
+# data
+downloads/
+
+# audio files
+*.wav
+*.flac
+*.mp3
+*.m4a
