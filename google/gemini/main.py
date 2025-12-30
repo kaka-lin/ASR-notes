@@ -13,7 +13,7 @@ async def main():
 
     # live 語音轉文字
     result_text = await gemini_agent.process(
-        "test.mp3", is_live=True, response_format="text"
+        "test.mp3", is_live=True, response_format="audio"
     )
     print("ASR 結果: ", result_text)
 

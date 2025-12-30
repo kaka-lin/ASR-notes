@@ -18,7 +18,7 @@ class GeminiAgent:
     def __init__(
         self,
         model_name: str = "gemini-2.5-flash",
-        live_model_name: str = "gemini-live-2.5-flash-preview",
+        live_model_name: str = "gemini-2.5-flash-native-audio-preview-12-2025",
         gemini_api_key: str = "",
         temperature: float = 0.0,
         max_output_tokens: int = 100,
@@ -55,7 +55,7 @@ class GeminiAgent:
         self,
         input_text: str,
         is_live: bool = False,
-        response_format: str = "text"
+        response_format: str = "audio"
     ) -> str:
         """使用 Google Gemini API 處理輸入"""
         if is_live:
@@ -63,7 +63,7 @@ class GeminiAgent:
         else:
             raise ValueError("ASR mode requires is_live=True.")
 
-    async def _asr_live(self, audio_path: str, response_format: str = "text", realtime: bool = True):
+    async def _asr_live(self, audio_path: str, response_format: str = "audio", realtime: bool = True):
         """使用 Google Gemini Live 模型 API 進行即時語音轉文字
 
         realtime:  True=用 sleep 模擬即時上送；False=盡快送完
